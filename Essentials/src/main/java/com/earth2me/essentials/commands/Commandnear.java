@@ -14,6 +14,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class Commandnear extends EssentialsCommand {
+    private static final String[] ARROWS = {"↑", "↗", "→", "↘", "↓", "↙", "←", "↖"};
+    private static final int MAX_PLAYERS = 10;
+
     public Commandnear() {
         super("near");
     }
@@ -99,18 +102,53 @@ public class Commandnear extends EssentialsCommand {
             }
         }
 
-        while (!nearbyPlayers.isEmpty()) {
+        if (nearbyPlayers.isEmpty()) {
+            return source.tl("none");
+        }
+
+        final boolean showInvseeButton = user.isAuthorized("essentials.invsee");
+        final String listKey = showInvseeButton ? "nearbyPlayersList" : "nearbyPlayersListNoInvsee";
+
+        // int -> счётчик отображённых игроков (для лимита и футера)
+        int shown = 0;
+
+        while (!nearbyPlayers.isEmpty() && shown < MAX_PLAYERS) {
             if (output.length() > 0) {
-                output.append(", ");
+                output.append("<newline>");
             }
             final User nearbyPlayer = nearbyPlayers.poll();
             if (nearbyPlayer == null) {
                 continue;
             }
-            output.append(user.playerTl("nearbyPlayersList", nearbyPlayer.getDisplayName(), (long)nearbyPlayer.getLocation().distance(loc)));
+
+            final String arrow = getArrow(loc, nearbyPlayer.getLocation());
+            output.append(user.playerTl(listKey, nearbyPlayer.getDisplayName(), (long) nearbyPlayer.getLocation().distance(loc), arrow, nearbyPlayer.getName()));
+            shown++;
         }
 
-        return output.length() > 1 ? output.toString() : source.tl("none");
+        // int -> String (завершающая строка с количеством показанных игроков)
+        output.append(user.playerTl("nearbyFooter", shown));
+
+        return output.toString();
+    }
+
+    // Location from, Location to  ->  String (стрелка ОТНОСИТЕЛЬНО взгляда игрока from)
+    private static String getArrow(final Location from, final Location to) {
+        final double dx = to.getX() - from.getX();
+        final double dz = to.getZ() - from.getZ();
+
+        double targetAngle = Math.toDegrees(Math.atan2(-dx, dz));
+        if (targetAngle < 0.0D) {
+            targetAngle += 360.0D;
+        }
+
+        double playerYaw = (double) from.getYaw();
+        playerYaw = (playerYaw % 360.0D + 360.0D) % 360.0D;
+
+        final double relativeAngle = (targetAngle - playerYaw + 360.0D) % 360.0D;
+
+        final int index = (int) Math.round(relativeAngle / 45.0D) % 8;
+        return ARROWS[index];
     }
 
     @Override

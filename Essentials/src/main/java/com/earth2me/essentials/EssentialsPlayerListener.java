@@ -10,7 +10,6 @@ import com.earth2me.essentials.textreader.TextInput;
 import com.earth2me.essentials.textreader.TextPager;
 import com.earth2me.essentials.userstorage.ModernUserMap;
 import com.earth2me.essentials.utils.CommonPlaceholders;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import com.earth2me.essentials.utils.DateUtil;
 import com.earth2me.essentials.utils.FormatUtil;
 import com.earth2me.essentials.utils.LocationUtil;
@@ -190,10 +189,6 @@ public class EssentialsPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerDeath(final org.bukkit.event.entity.PlayerDeathEvent event) {
-        event.getEntity().spigot().respawn();
-    }
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(final AsyncPlayerChatEvent event) {
         final User user = ess.getUser(event.getPlayer());

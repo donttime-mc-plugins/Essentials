@@ -3,6 +3,7 @@ package com.earth2me.essentials.commands;
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.User;
 import com.earth2me.essentials.adventure.AdventureUtil;
+import com.earth2me.essentials.near.NearRadiusConfig;
 import com.google.common.collect.Lists;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -23,11 +24,15 @@ public class Commandnear extends EssentialsCommand {
 
     @Override
     protected void run(final Server server, final User user, final String commandLabel, final String[] args) throws Exception {
-        long maxRadius = ess.getSettings().getNearRadius();
-
-        if (maxRadius == 0) {
-            maxRadius = 200;
+        // Базовая дальность из настроек Essentials (near-radius в config.yml, не трогаем).
+        long baseRadius = ess.getSettings().getNearRadius();
+        if (baseRadius == 0) {
+            baseRadius = 200;
         }
+
+        // Донат-дальность: максимум среди всех essentials.near.GROUP пермишенов игрока,
+        // заданных в near-permissions.yml. Если ни одного нет - остаётся baseRadius.
+        final long maxRadius = NearRadiusConfig.getInstance(ess).getMaxRadiusFor(user, baseRadius);
 
         long radius = maxRadius;
 
@@ -52,7 +57,7 @@ public class Commandnear extends EssentialsCommand {
 
         radius = Math.abs(radius);
 
-        if (radius > maxRadius && !user.isAuthorized("essentials.near.maxexempt")) {
+        if (radius > maxRadius) {
             user.sendTl("radiusTooBig", maxRadius);
             radius = maxRadius;
         }

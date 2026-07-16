@@ -30,7 +30,7 @@ public class Commandclearinventory extends EssentialsCommand {
     @Override
     public void run(final Server server, final User user, final String commandLabel, final String[] args) throws Exception {
         parseCommand(server, user.getSource(), commandLabel, args, user.isAuthorized("essentials.clearinventory.others"),
-            user.isAuthorized("essentials.clearinventory.all") || user.isAuthorized("essentials.clearinventory.multiple"));
+                user.isAuthorized("essentials.clearinventory.all") || user.isAuthorized("essentials.clearinventory.multiple"));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Commandclearinventory extends EssentialsCommand {
     }
 
     private void parseCommand(final Server server, final CommandSource sender, final String commandLabel, final String[] args, final boolean allowOthers, final boolean allowAll)
-        throws Exception {
+            throws Exception {
         Collection<Player> players = new ArrayList<>();
         final User senderUser = ess.getUser(sender.getPlayer());
         String previousClearCommand = "";
@@ -82,7 +82,7 @@ public class Commandclearinventory extends EssentialsCommand {
     }
 
     protected void clearHandler(final CommandSource sender, final Player player, final String[] args, final int offset, final boolean showExtended) throws TranslatableException {
-        ClearHandlerType type = ClearHandlerType.ALL_EXCEPT_ARMOR;
+        ClearHandlerType type = ClearHandlerType.ALL_INCLUDING_ARMOR;
         final Set<Item> items = new HashSet<>();
         int amount = -1;
 
